@@ -3,7 +3,7 @@ from asset import *
 
 class CommonStockDividendYieldTest(unittest.TestCase):
     def setUp(self):
-        self.test_stock_factory = StockFactory('test_stocks.csv')
+        self.test_stock_factory = StockIndex('test_stocks.csv')
         self.test_stock_com = self.test_stock_factory.get_stock('POP')
         #self.test_stock_prf = self.test_stock_factory.get_stock('GIN')
 
@@ -22,7 +22,7 @@ class CommonStockDividendYieldTest(unittest.TestCase):
 
 class PrefStockDividendYieldTest(unittest.TestCase):
     def setUp(self):
-        self.test_stock_factory = StockFactory('test_stocks.csv')
+        self.test_stock_factory = StockIndex('test_stocks.csv')
         self.test_stock_prf = self.test_stock_factory.get_stock('GIN')
 
     def tearDown(self):
@@ -40,7 +40,7 @@ class PrefStockDividendYieldTest(unittest.TestCase):
 
 class CommonStockPERatioTest(unittest.TestCase):
     def setUp(self):
-        self.test_stock_factory = StockFactory('test_stocks.csv')
+        self.test_stock_factory = StockIndex('test_stocks.csv')
         self.test_stock_com = self.test_stock_factory.get_stock('POP')
 
     def tearDown(self):
@@ -58,7 +58,7 @@ class CommonStockPERatioTest(unittest.TestCase):
 
 class PrefStockPERatioTest(unittest.TestCase):
     def setUp(self):
-        self.test_stock_factory = StockFactory('test_stocks.csv')
+        self.test_stock_factory = StockIndex('test_stocks.csv')
         self.test_stock_prf = self.test_stock_factory.get_stock('GIN')
 
     def tearDown(self):

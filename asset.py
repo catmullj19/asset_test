@@ -1,6 +1,7 @@
 import csv
+import sys
 
-class StockFactory(object):
+class StockIndex(object):
     def __init__(self, stock_file):
         self.stock_file = stock_file
         self.stock_lookup = {}
@@ -20,9 +21,9 @@ class StockFactory(object):
                     par_value=row['Par Value']
                     fixed_div=row['Fixed Dividend']
                     if row['Type'] == 'Common':
-                        stock = Stock(sym=symbol, last_div=last_div, par_value=par_value)
+                        stock = CommonStock(symbol=symbol, last_div=last_div, par_value=par_value)
                     elif row['Type'] == 'Preferred':
-                        stock = PrefStock(sym=symbol, last_div=last_div, par_value=par_value, fixed_div=fixed_div)
+                        stock = PrefStock(symbol=symbol, last_div=last_div, par_value=par_value, fixed_div=fixed_div)
                     self.stock_lookup[stock.symbol] = stock 
 
     def get_stock(self, symbol):
@@ -33,15 +34,30 @@ class StockFactory(object):
             return None
         return stock
 
-## Representation of a basic ordinary 'stock'
+## Stock interface
 class Stock(object):
+
+    def get_div_yield(self, price):
+        return (False, None)
+
+    def get_pe_ratio(self, price):
+        return (False, None)
+
+    def get_vwsp(self):
+        return None
+
+    def record_trade(self, price, timestamp, side, volume):
+        pass
+
+## Representation of a common stock
+class CommonStock(Stock):
     def __init__(self, **kwargs):
         try:
-            self.symbol = kwargs['sym']
+            self.symbol = kwargs['symbol']
             self.last_div = kwargs['last_div']
             self.par_value = kwargs['par_value']
         except:
-            pass
+            sys.stderr.write("missing required arguments\n")
 
     def get_div_yield(self, price):
         return (True, float(self.last_div)/float(price))
@@ -59,12 +75,12 @@ class Stock(object):
 class PrefStock(Stock):
     def __init__(self, **kwargs):
         try:
-            self.symbol = kwargs['sym']
+            self.symbol = kwargs['symbol']
             self.last_div = kwargs['last_div']
             self.par_value = kwargs['par_value']
             self.fixed_div = kwargs['fixed_div']
         except:
-            pass
+            sys.stderr.write("missing required arguments\n")
 
     def get_div_yield(self, price):
         return (True, float(self.fixed_div)/100*float(self.par_value)/float(price))
