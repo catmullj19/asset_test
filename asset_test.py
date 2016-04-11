@@ -1,11 +1,12 @@
+import sys
 import unittest
+from datetime import datetime
 from asset import *
 
 class CommonStockDividendYieldTest(unittest.TestCase):
     def setUp(self):
-        self.test_stock_factory = StockIndex('test_stocks.csv')
-        self.test_stock_com = self.test_stock_factory.get_stock('POP')
-        #self.test_stock_prf = self.test_stock_factory.get_stock('GIN')
+        self.test_stock_index = StockIndex('test_stocks.csv')
+        self.test_stock_com = self.test_stock_index.get_stock('POP')
 
     def tearDown(self):
         pass
@@ -22,8 +23,8 @@ class CommonStockDividendYieldTest(unittest.TestCase):
 
 class PrefStockDividendYieldTest(unittest.TestCase):
     def setUp(self):
-        self.test_stock_factory = StockIndex('test_stocks.csv')
-        self.test_stock_prf = self.test_stock_factory.get_stock('GIN')
+        self.test_stock_index = StockIndex('test_stocks.csv')
+        self.test_stock_prf = self.test_stock_index.get_stock('GIN')
 
     def tearDown(self):
         pass
@@ -40,8 +41,8 @@ class PrefStockDividendYieldTest(unittest.TestCase):
 
 class CommonStockPERatioTest(unittest.TestCase):
     def setUp(self):
-        self.test_stock_factory = StockIndex('test_stocks.csv')
-        self.test_stock_com = self.test_stock_factory.get_stock('POP')
+        self.test_stock_index = StockIndex('test_stocks.csv')
+        self.test_stock_com = self.test_stock_index.get_stock('POP')
 
     def tearDown(self):
         pass
@@ -58,8 +59,8 @@ class CommonStockPERatioTest(unittest.TestCase):
 
 class PrefStockPERatioTest(unittest.TestCase):
     def setUp(self):
-        self.test_stock_factory = StockIndex('test_stocks.csv')
-        self.test_stock_prf = self.test_stock_factory.get_stock('GIN')
+        self.test_stock_index = StockIndex('test_stocks.csv')
+        self.test_stock_prf = self.test_stock_index.get_stock('GIN')
 
     def tearDown(self):
         pass
@@ -74,6 +75,25 @@ class PrefStockPERatioTest(unittest.TestCase):
     def __str__(self):
         return 'PrefStockPERatioTest'
 
+class CommonStockTradeTest(unittest.TestCase):
+    def setUp(self):
+        self.test_stock_index = StockIndex('test_stocks.csv')
+        self.test_stock_com = self.test_stock_index.get_stock('POP')
+
+    def tearDown(self):
+        pass
+
+    def test_common_stock_trade(self):
+        test_price = 299.9
+        test_volume = 5000
+        test_side = 'B'
+        test_timestamp = datetime.strptime("03/04/06 10:30:01", "%d/%m/%y %H:%M:%S")
+        status = self.test_stock_com.record_trade(test_price, test_timestamp, test_side, test_volume)
+        self.assertEqual(status, True)
+
+    def __str__(self):
+        return 'CommonStockTradeTest'
+
 def div_yield_suite():
     suite = unittest.TestSuite()
     suite.addTest(CommonStockDividendYieldTest('test_get_com_div_yield'))
@@ -86,7 +106,17 @@ def pe_ratio_suite():
     suite.addTest(PrefStockPERatioTest('test_get_prf_pe_ratio'))
     return suite
 
+def trade_suite():
+    suite = unittest.TestSuite()
+    suite.addTest(CommonStockTradeTest('test_common_stock_trade'))
+    return suite
+
 if __name__ == '__main__':
 
+    sys.stdout.write('\n\n********************\n')
+    sys.stdout.write('** Starting Tests **\n')
+    sys.stdout.write('********************\n\n')
     unittest.TextTestRunner(verbosity=2).run(div_yield_suite())
     unittest.TextTestRunner(verbosity=2).run(pe_ratio_suite())
+    unittest.TextTestRunner(verbosity=2).run(trade_suite())
+    

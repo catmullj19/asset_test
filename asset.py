@@ -34,6 +34,13 @@ class StockIndex(object):
             return None
         return stock
 
+class Trade(object):
+    def __init__(self, price, timestamp, side, volume):
+        self.price = price
+        self.timestamp = timestamp
+        self.side = side
+        self.volume = volume
+
 ## Stock interface
 class Stock(object):
 
@@ -56,8 +63,8 @@ class CommonStock(Stock):
             self.symbol = kwargs['symbol']
             self.last_div = kwargs['last_div']
             self.par_value = kwargs['par_value']
-        except:
-            sys.stderr.write("missing required arguments\n")
+        except KeyError, e:
+            sys.stderr.write('missing required arguments - "%s"\n' % str(e))
 
     def get_div_yield(self, price):
         return (True, float(self.last_div)/float(price))
@@ -79,8 +86,8 @@ class PrefStock(Stock):
             self.last_div = kwargs['last_div']
             self.par_value = kwargs['par_value']
             self.fixed_div = kwargs['fixed_div']
-        except:
-            sys.stderr.write("missing required arguments\n")
+        except KeyError, e:
+            sys.stderr.write('missing required arguments - "%s"\n' % str(e))
 
     def get_div_yield(self, price):
         return (True, float(self.fixed_div)/100*float(self.par_value)/float(price))
