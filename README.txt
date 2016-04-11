@@ -40,3 +40,7 @@ Calculate all share index
 Test for this :-
 
 test case 1) submit a number of trades for different stocks (req 3), verify that correct index is calculated.
+
+*** First submit with some basic tests working
+
+*** Refactored class hierarchy slightly
