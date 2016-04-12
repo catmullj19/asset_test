@@ -183,7 +183,7 @@ class StockIndexTest(unittest.TestCase):
         pass
 
     def test_stock_index(self):
-        # record trades to create prices
+        # record trades to create some prices
         for s in self.test_stocks:
             s.record_trade(100, datetime.now(), 'B', 10)
 

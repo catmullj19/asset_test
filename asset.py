@@ -9,6 +9,7 @@ class StockIndex(object):
         self.stock_lookup = {}
         self.readStocks()
 
+# Read stock list and attributes from a CSV file
     def readStocks(self):
         with open(self.stock_file, 'r') as f:
             stocks = csv.reader(f, delimiter=',')
@@ -28,6 +29,7 @@ class StockIndex(object):
                         stock = PrefStock(symbol=symbol, last_div=last_div, par_value=par_value, fixed_div=fixed_div)
                     self.stock_lookup[stock.symbol] = stock 
 
+# Get a stock by symbol
     def get_stock(self, symbol):
         try:
             stock = self.stock_lookup[symbol]
@@ -36,8 +38,9 @@ class StockIndex(object):
             return None
         return stock
 
+# Calculate the all share index
     def calculate_index(self):
-        # Calculate geometric mean of all vol weighted stock prices
+        # Calculate geometric mean of  vol weighted stock prices for all stocks
         return (reduce(operator.mul, [r.get_vwsp() for r in self.stock_lookup.values()])) ** (1.0/len(self.stock_lookup))
 
 
@@ -69,17 +72,15 @@ class Stock(object):
 
     def get_vwsp(self):
         th = datetime.now() - timedelta(minutes = 5)
-        num = sum([ float(r.price) * r.volume for r in self.get_trades() if r.timestamp >= th ])
-        denom = sum([ r.volume for r in self.get_trades() if r.timestamp >= th ])
+        num = sum([ float(r.price) * r.volume for r in self.trades if r.timestamp >= th ])
+        denom = sum([ r.volume for r in self.trades if r.timestamp >= th ])
         return num/denom if denom > 0 else 0
 
     def record_trade(self, price, timestamp, side, volume):
         trade = TradeReport(price, timestamp, side, volume)
-        self.get_trades().append(trade)
+        self.trades.append(trade)
         return True
 
-    def get_trades(self):
-        return self.trades
 
 ## Representation of a common stock
 class CommonStock(Stock):
