@@ -1,5 +1,6 @@
 import csv
 import sys
+import operator
 from datetime import datetime,timedelta
 
 class StockIndex(object):
@@ -35,6 +36,12 @@ class StockIndex(object):
             return None
         return stock
 
+    def calculate_index(self):
+        # Calculate geometric mean of all vol weighted stock prices
+        return (reduce(operator.mul, [r.get_vwsp() for r in self.stock_lookup.values()])) ** (1.0/len(self.stock_lookup))
+
+
+# Simple trade report class
 class TradeReport(object):
     def __init__(self, price, timestamp, side, volume):
         self.price = price
@@ -49,14 +56,10 @@ class TradeReport(object):
                                         self.side,
                                         self.volume)
 
-    # Comparator for timestamp
-    #def __cmp__(self, other):
-        #if hasattr(other, 'timestamp'):
-            #return self.timestamp.__cmp__(other.timestamp)
-
-## Stock interface
+## Stock super class
 class Stock(object):
-    trades = []
+    def __init__(self):
+        self.trades = []
         
     def get_div_yield(self, price):
         return (False, None)
@@ -65,10 +68,15 @@ class Stock(object):
         return (False, None)
 
     def get_vwsp(self):
-        return None
+        th = datetime.now() - timedelta(minutes = 5)
+        num = sum([ float(r.price) * r.volume for r in self.get_trades() if r.timestamp >= th ])
+        denom = sum([ r.volume for r in self.get_trades() if r.timestamp >= th ])
+        return num/denom if denom > 0 else 0
 
     def record_trade(self, price, timestamp, side, volume):
-        pass
+        trade = TradeReport(price, timestamp, side, volume)
+        self.get_trades().append(trade)
+        return True
 
     def get_trades(self):
         return self.trades
@@ -76,7 +84,7 @@ class Stock(object):
 ## Representation of a common stock
 class CommonStock(Stock):
     def __init__(self, **kwargs):
-        super(Stock, self).__init__()
+        super(CommonStock, self).__init__()
         try:
             self.symbol = kwargs['symbol']
             self.last_div = kwargs['last_div']
@@ -90,20 +98,11 @@ class CommonStock(Stock):
     def get_pe_ratio(self, price):
         return (True, float(price)/float(self.last_div))
 
-    def get_vwsp(self):
-        th = datetime.now() - timedelta(minutes = 5)
-        print [ r for r in self.get_trades() if r.timestamp > th ]
-        return None
-
-    def record_trade(self, price, timestamp, side, volume):
-        trade = TradeReport(price, timestamp, side, volume)
-        self.get_trades().append(trade)
-        return True
 
 ## Representation of a preferred stock
 class PrefStock(Stock):
     def __init__(self, **kwargs):
-        super(Stock, self).__init__()
+        super(PrefStock, self).__init__()
         try:
             self.symbol = kwargs['symbol']
             self.last_div = kwargs['last_div']
@@ -117,9 +116,3 @@ class PrefStock(Stock):
 
     def get_pe_ratio(self, price):
         return (True, float(price)/(float(self.fixed_div)/100*float(self.par_value)))
-
-    def get_vwsp(self):
-        return 0
-
-    def record_trade(self, price, timestamp, side, volume):
-        pass

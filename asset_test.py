@@ -1,6 +1,7 @@
 import sys
 import unittest
-from datetime import datetime
+from datetime import datetime,timedelta
+
 from asset import *
 
 class CommonStockDividendYieldTest(unittest.TestCase):
@@ -87,7 +88,7 @@ class CommonStockTradeTest(unittest.TestCase):
         test_price = 299.9
         test_volume = 5000
         test_side = 'B'
-        test_timestamp = datetime.strptime("03/04/06 10:30:01", "%d/%m/%y %H:%M:%S")
+        test_timestamp = datetime.strptime("30/03/16 10:30:01", "%d/%m/%y %H:%M:%S")
         status = self.test_stock_com.record_trade(test_price, test_timestamp, test_side, test_volume)
         self.assertEqual(status, True)
 
@@ -95,6 +96,7 @@ class CommonStockTradeTest(unittest.TestCase):
         return 'CommonStockTradeTest'
 
 class CommonStockVWSPTest(unittest.TestCase):
+    
     def setUp(self):
         self.test_stock_index = StockIndex('test_stocks.csv')
         self.test_stock_com = self.test_stock_index.get_stock('POP')
@@ -106,13 +108,90 @@ class CommonStockVWSPTest(unittest.TestCase):
         test_price = 299.9
         test_volume = 5000
         test_side = 'B'
-        test_timestamp = datetime.strptime("03/04/06 10:30:01", "%d/%m/%y %H:%M:%S")
+        test_timestamp = datetime.now() - timedelta(seconds=50)
         self.test_stock_com.record_trade(test_price, test_timestamp, test_side, test_volume)
+        test_price = 299.1
+        test_volume = 10000
+        test_side = 'S'
+        test_timestamp = datetime.now() - timedelta(seconds=40)
+        self.test_stock_com.record_trade(test_price, test_timestamp, test_side, test_volume)
+        test_price = 300
+        test_volume = 500
+        test_side = 'B'
+        test_timestamp = datetime.now() - timedelta(seconds=30)
+        self.test_stock_com.record_trade(test_price, test_timestamp, test_side, test_volume)
+        test_price = 289.9
+        test_volume = 50000
+        test_side = 'S'
+        test_timestamp = datetime.now() - timedelta(seconds=301)
+        self.test_stock_com.record_trade(test_price, test_timestamp, test_side, test_volume)
+
         test_vwsp = self.test_stock_com.get_vwsp()
-        self.assertEqual(test_vwsp, 289.89)
+        self.assertAlmostEqual(test_vwsp, 299.3870968)
 
     def __str__(self):
         return 'CommonStockVWSPTest'
+
+class PrefStockVWSPTest(unittest.TestCase):
+    
+    def setUp(self):
+        self.test_stock_index = StockIndex('test_stocks.csv')
+        self.test_stock_pref = self.test_stock_index.get_stock('GIN')
+
+    def tearDown(self):
+        pass
+
+    def test_pref_stock_vswp(self):
+        test_price = 300
+        test_volume = 10
+        test_side = 'S'
+        test_timestamp = datetime.now() - timedelta(seconds=50)
+        self.test_stock_pref.record_trade(test_price, test_timestamp, test_side, test_volume)
+        test_price = 301
+        test_volume = 20
+        test_side = 'B'
+        test_timestamp = datetime.now() - timedelta(seconds=40)
+        self.test_stock_pref.record_trade(test_price, test_timestamp, test_side, test_volume)
+        test_price = 302
+        test_volume = 50
+        test_side = 'B'
+        test_timestamp = datetime.now() - timedelta(seconds=30)
+        self.test_stock_pref.record_trade(test_price, test_timestamp, test_side, test_volume)
+        test_price = 300
+        test_volume = 500
+        test_side = 'S'
+        test_timestamp = datetime.now() - timedelta(seconds=301)
+        self.test_stock_pref.record_trade(test_price, test_timestamp, test_side, test_volume)
+
+        test_vwsp = self.test_stock_pref.get_vwsp()
+        self.assertAlmostEqual(test_vwsp, 301.5)
+
+    def __str__(self):
+        return 'PrefStockVWSPTest'
+
+class StockIndexTest(unittest.TestCase):
+    def setUp(self):
+        self.test_stock_index = StockIndex('test_stocks.csv')
+        self.test_stocks = []
+        self.test_stocks.append(self.test_stock_index.get_stock('TEA'))
+        self.test_stocks.append(self.test_stock_index.get_stock('POP'))
+        self.test_stocks.append(self.test_stock_index.get_stock('ALE'))
+        self.test_stocks.append(self.test_stock_index.get_stock('GIN'))
+        self.test_stocks.append(self.test_stock_index.get_stock('JOE'))
+
+    def tearDown(self):
+        pass
+
+    def test_stock_index(self):
+        # record trades to create prices
+        for s in self.test_stocks:
+            s.record_trade(100, datetime.now(), 'B', 10)
+
+        index_val = self.test_stock_index.calculate_index()
+        self.assertAlmostEqual(index_val, 100)
+
+    def __str__(self):
+        return 'StockIndexTest'
 
 def div_yield_suite():
     suite = unittest.TestSuite()
@@ -134,6 +213,12 @@ def trade_suite():
 def vswp_suite():
     suite = unittest.TestSuite()
     suite.addTest(CommonStockVWSPTest('test_common_stock_vswp'))
+    suite.addTest(PrefStockVWSPTest('test_pref_stock_vswp'))
+    return suite
+    
+def index_suite():
+    suite = unittest.TestSuite()
+    suite.addTest(StockIndexTest('test_stock_index'))
     return suite
     
 if __name__ == '__main__':
@@ -145,5 +230,7 @@ if __name__ == '__main__':
     unittest.TextTestRunner(verbosity=2).run(pe_ratio_suite())
     unittest.TextTestRunner(verbosity=2).run(trade_suite())
     unittest.TextTestRunner(verbosity=2).run(vswp_suite())
+    unittest.TextTestRunner(verbosity=2).run(index_suite())
+    
     
     

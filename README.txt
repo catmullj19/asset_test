@@ -46,3 +46,8 @@ test case 1) submit a number of trades for different stocks (req 3), verify that
 *** Refactored class hierarchy slightly
 
 *** Next, adding trade recording and starting calculation of VWSP
+
+Was going to create a mock datetime when testing trade recording, but decided to avoid them - I think they can end up hiding bugs.
+
+*** Added calculation of VWSP and all share index value. A little more refactoring. Still need to add some more rigorous tests.
+
