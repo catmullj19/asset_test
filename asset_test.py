@@ -94,6 +94,26 @@ class CommonStockTradeTest(unittest.TestCase):
     def __str__(self):
         return 'CommonStockTradeTest'
 
+class CommonStockVWSPTest(unittest.TestCase):
+    def setUp(self):
+        self.test_stock_index = StockIndex('test_stocks.csv')
+        self.test_stock_com = self.test_stock_index.get_stock('POP')
+
+    def tearDown(self):
+        pass
+
+    def test_common_stock_vswp(self):
+        test_price = 299.9
+        test_volume = 5000
+        test_side = 'B'
+        test_timestamp = datetime.strptime("03/04/06 10:30:01", "%d/%m/%y %H:%M:%S")
+        self.test_stock_com.record_trade(test_price, test_timestamp, test_side, test_volume)
+        test_vwsp = self.test_stock_com.get_vwsp()
+        self.assertEqual(test_vwsp, 289.89)
+
+    def __str__(self):
+        return 'CommonStockVWSPTest'
+
 def div_yield_suite():
     suite = unittest.TestSuite()
     suite.addTest(CommonStockDividendYieldTest('test_get_com_div_yield'))
@@ -111,6 +131,11 @@ def trade_suite():
     suite.addTest(CommonStockTradeTest('test_common_stock_trade'))
     return suite
 
+def vswp_suite():
+    suite = unittest.TestSuite()
+    suite.addTest(CommonStockVWSPTest('test_common_stock_vswp'))
+    return suite
+    
 if __name__ == '__main__':
 
     sys.stdout.write('\n\n********************\n')
@@ -119,4 +144,6 @@ if __name__ == '__main__':
     unittest.TextTestRunner(verbosity=2).run(div_yield_suite())
     unittest.TextTestRunner(verbosity=2).run(pe_ratio_suite())
     unittest.TextTestRunner(verbosity=2).run(trade_suite())
+    unittest.TextTestRunner(verbosity=2).run(vswp_suite())
+    
     

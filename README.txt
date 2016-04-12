@@ -1,6 +1,6 @@
 README.txt
 
-Basoc requirements and approach
+Basic requirements and approach
 
 Requirement 1
 Given a stock and a price calculate div. yield
@@ -44,3 +44,5 @@ test case 1) submit a number of trades for different stocks (req 3), verify that
 *** First submit with some basic tests working
 
 *** Refactored class hierarchy slightly
+
+*** Next, adding trade recording and starting calculation of VWSP
