@@ -126,7 +126,7 @@ class CommonStockVWSPTest(unittest.TestCase):
         test_timestamp = datetime.now() - timedelta(seconds=301)
         self.test_stock_com.record_trade(test_price, test_timestamp, test_side, test_volume)
 
-        test_vwsp = self.test_stock_com.get_vwsp()
+        test_vwsp = self.test_stock_com.get_vwsp(5)
         self.assertAlmostEqual(test_vwsp, 299.3870968)
 
     def __str__(self):
@@ -163,7 +163,7 @@ class PrefStockVWSPTest(unittest.TestCase):
         test_timestamp = datetime.now() - timedelta(seconds=301)
         self.test_stock_pref.record_trade(test_price, test_timestamp, test_side, test_volume)
 
-        test_vwsp = self.test_stock_pref.get_vwsp()
+        test_vwsp = self.test_stock_pref.get_vwsp(5)
         self.assertAlmostEqual(test_vwsp, 301.5)
 
     def __str__(self):
@@ -183,7 +183,11 @@ class StockIndexTest(unittest.TestCase):
         pass
 
     def test_stock_index(self):
-        # record trades to create some prices
+        # no prices for stocks
+        index_val = self.test_stock_index.calculate_index()
+        self.assertEqual(index_val, 0)
+        
+        # record trades to create prices
         for s in self.test_stocks:
             s.record_trade(100, datetime.now(), 'B', 10)
 

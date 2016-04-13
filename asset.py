@@ -1,7 +1,7 @@
 import csv
 import sys
 import operator
-from datetime import datetime,timedelta
+from datetime import datetime,timedelta,MINYEAR
 
 class StockIndex(object):
     def __init__(self, stock_file):
@@ -70,8 +70,12 @@ class Stock(object):
     def get_pe_ratio(self, price):
         return (False, None)
 
-    def get_vwsp(self):
-        th = datetime.now() - timedelta(minutes = 5)
+    def get_vwsp(self, since=None):
+        th = datetime.now()
+        if since != None:
+            th = datetime.now() - timedelta(minutes = since)
+        else:
+            th = datetime(MINYEAR,1,1,0,0)        
         num = sum([ float(r.price) * r.volume for r in self.trades if r.timestamp >= th ])
         denom = sum([ r.volume for r in self.trades if r.timestamp >= th ])
         return num/denom if denom > 0 else 0

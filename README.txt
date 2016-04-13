@@ -51,3 +51,4 @@ Was going to create a mock datetime when testing trade recording, but decided to
 
 *** Added calculation of VWSP and all share index value. A little more refactoring. Still need to add some more rigorous tests.
 
+*** Add a new test and fixed issue with fixed vwsp calculation
